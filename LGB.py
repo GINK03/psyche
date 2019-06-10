@@ -67,8 +67,9 @@ def trainer():
         # print(mae)
         # maes.append(mae)
 
-def shot_train(xs, ys, XT, param, folds, eval_func, verbose, early_stopping_rounds, n_estimators):
-    if isinstance(xs,(pd.DataFrame)):
+
+def shot_train(xs, ys, XT, categories, param, folds, eval_func, verbose, early_stopping_rounds, n_estimators):
+    if isinstance(xs, (pd.DataFrame)):
         print('input xs, ys, XT may be pd.DataFrame, so change to np.array')
         xs = xs.values
         ys = ys.values
@@ -76,11 +77,11 @@ def shot_train(xs, ys, XT, param, folds, eval_func, verbose, early_stopping_roun
     eval_losses = []
     oof_predictions = np.zeros((len(xs),))
     test_predictions = np.zeros((len(XT),))
-
+    models = []
     for idx, (trn_idx, val_idx) in enumerate(folds.split(xs)):
         print('split size is', folds.get_n_splits())
-        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx])
-        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx])
+        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=categories)
+        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=categories)
         num_round = n_estimators
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
             trn_data, val_data], verbose_eval=verbose, early_stopping_rounds=early_stopping_rounds)
@@ -90,5 +91,9 @@ def shot_train(xs, ys, XT, param, folds, eval_func, verbose, early_stopping_roun
         eval_loss = eval_func(ys[val_idx], clf.predict(xs[val_idx]))
         print(f'fold {idx:02d} eval_loss {eval_loss}')
         eval_losses.append(eval_loss)
-    
-    return {'eval_loss':np.mean(eval_losses), 'oof_predictions':oof_predictions, 'test_predictions':test_predictions}
+        models.append(clf)
+
+    return {'eval_loss': np.mean(eval_losses), \
+            'oof_predictions': oof_predictions, \
+            'test_predictions': test_predictions, \
+            'models':models }

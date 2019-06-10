@@ -1,4 +1,5 @@
 import json
+from typing import Callable, Iterator, Union, Optional, List
 import glob
 import sys
 import optuna
@@ -19,12 +20,15 @@ class Singleton(object):
         self.ys = None
         self.category = None
 
+
 S = Singleton()
 
-def set_data(xs, ys, category):
+
+def set_data(xs:Union[np.array, pd.DataFrame], ys:Union[np.array, pd.DataFrame], category:List):
     S.xs = xs
     S.ys = ys
     S.category = category
+
 
 def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2):
     param = {
@@ -81,6 +85,10 @@ finish = False
 
 
 def run(n_trials=10):
+    if isinstance(S.xs, pd.DataFrame):
+        print('S.xs is may be pd.DataFrame, so change S.xs, S.ys to np.array')
+        S.xs = S.xs.values
+        S.ys = S.ys.values
     global finish
     finish = False
     study = optuna.create_study()
