@@ -11,14 +11,20 @@ from sklearn.model_selection import KFold, KFold
 from sklearn import metrics
 from sklearn.model_selection import KFold
 import EvalFunc
+
+
 class Singleton(object):
     def __init__(self):
         self.xs = None
         self.ys = None
+        self.category = None
+
 S = Singleton()
-def set_data(xs,ys):
-    S.xs=xs
-    S.ys=ys
+
+def set_data(xs, ys, category):
+    S.xs = xs
+    S.ys = ys
+    S.category = category
 
 def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2):
     param = {
@@ -43,11 +49,11 @@ def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1
     predictions = np.zeros((len(S.xs), ))
     models = []
     for idx, (trn_idx, val_idx) in enumerate(kf.split(S.xs)):
-        trn_data = lgb.Dataset(S.xs[trn_idx], label=S.ys[trn_idx])
-        val_data = lgb.Dataset(S.xs[val_idx], label=S.ys[val_idx])
+        trn_data = lgb.Dataset(S.xs[trn_idx], label=S.ys[trn_idx], categorical_feature=S.category)
+        val_data = lgb.Dataset(S.xs[val_idx], label=S.ys[val_idx], categorical_feature=S.category)
         num_round = 10000
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
-            trn_data, val_data], verbose_eval=0, early_stopping_rounds=10)
+            trn_data, val_data], verbose_eval=0, early_stopping_rounds=10, categorical_feature=S.category)
         predictions[val_idx] = clf.predict(S.xs[val_idx])
         models.append(clf)
         #mae = metrics.mean_absolute_error(ys[val_idx], clf.predict(xs[val_idx]))
@@ -60,6 +66,7 @@ def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1
     else:
         return (np.mean(eval_losses), models)
 
+
 def objective(trial):
     max_depth = trial.suggest_int('max_depth', 2, 100)
     num_leaves = trial.suggest_int('num_leaves', 2, 100)
@@ -69,9 +76,13 @@ def objective(trial):
     lambda_l2 = trial.suggest_uniform('lambda_l2', 0, 5)
     return trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2)
 
+
 finish = False
+
+
 def run(n_trials=10):
     global finish
+    finish = False
     study = optuna.create_study()
     study.optimize(objective, n_trials=n_trials)
     best_param = study.best_params

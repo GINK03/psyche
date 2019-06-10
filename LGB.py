@@ -12,14 +12,20 @@ from sklearn import metrics
 from sklearn.model_selection import KFold
 import EvalFunc
 
+
 class Singleton(object):
     def __init__(self):
         self.xs = None
         self.ys = None
+
+
 S = Singleton()
-def set_data(xs,ys):
-    S.xs=xs
-    S.ys=ys
+
+
+def set_data(xs, ys):
+    S.xs = xs
+    S.ys = ys
+
 
 def trainer():
     #assert S.xs != None, "must set data first"
@@ -55,8 +61,34 @@ def trainer():
             trn_data, val_data], verbose_eval=100, early_stopping_rounds=10)
         # valのmae
         predictions[val_idx] = clf.predict(S.xs[val_idx])
-        mape=EvalFunc.mape(S.ys[val_idx], clf.predict(S.xs[val_idx]))
+        mape = EvalFunc.mape(S.ys[val_idx], clf.predict(S.xs[val_idx]))
         print(mape)
         #mae = metrics.mean_absolute_error(S.ys[val_idx], clf.predict(S.xs[val_idx]))
-        #print(mae)
-        #maes.append(mae)
+        # print(mae)
+        # maes.append(mae)
+
+def shot_train(xs, ys, XT, param, folds, eval_func, verbose, early_stopping_rounds, n_estimators):
+    if isinstance(xs,(pd.DataFrame)):
+        print('input xs, ys, XT may be pd.DataFrame, so change to np.array')
+        xs = xs.values
+        ys = ys.values
+        XT = XT.values
+    eval_losses = []
+    oof_predictions = np.zeros((len(xs),))
+    test_predictions = np.zeros((len(XT),))
+
+    for idx, (trn_idx, val_idx) in enumerate(folds.split(xs)):
+        print('split size is', folds.get_n_splits())
+        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx])
+        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx])
+        num_round = n_estimators
+        clf = lgb.train(param, trn_data, num_round, valid_sets=[
+            trn_data, val_data], verbose_eval=verbose, early_stopping_rounds=early_stopping_rounds)
+        # valのmae
+        oof_predictions[val_idx] = clf.predict(xs[val_idx])
+        test_predictions += clf.predict(XT) / folds.get_n_splits()
+        eval_loss = eval_func(ys[val_idx], clf.predict(xs[val_idx]))
+        print(f'fold {idx:02d} eval_loss {eval_loss}')
+        eval_losses.append(eval_loss)
+    
+    return {'eval_loss':np.mean(eval_losses), 'oof_predictions':oof_predictions, 'test_predictions':test_predictions}
