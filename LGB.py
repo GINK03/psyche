@@ -21,7 +21,8 @@ class Singleton(object):
         self.eval_func = None
         self.param = None
 S = Singleton()
-def set_data(xs, ys, categories=[], eval_func=None, param):
+
+def set_data(xs, ys, categories=[], eval_func=None, param=None):
     S.xs = xs
     S.ys = ys
     S.categories = categories
