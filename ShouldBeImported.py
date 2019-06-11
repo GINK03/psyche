@@ -39,3 +39,10 @@ import EvalFunc
 import ExpectIsCategorical
 import LabelEncoder
 import CountEncoder
+import GetCorHeatMap
+import GetFeatureImportance
+# COL数
+pd.set_option("display.max_columns", 120)
+# 幅
+from IPython.core.display import display, HTML
+display(HTML("<style>.container { width:100% !important; }</style>"))
