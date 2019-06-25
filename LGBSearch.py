@@ -12,7 +12,8 @@ from sklearn.model_selection import KFold, KFold
 from sklearn import metrics
 from sklearn.model_selection import KFold
 import EvalFunc
-
+import warnings
+warnings.filterwarnings("ignore")
 
 class Singleton(object):
     def __init__(self):
@@ -24,10 +25,11 @@ class Singleton(object):
 S = Singleton()
 
 
-def set_data(xs:Union[np.array, pd.DataFrame], ys:Union[np.array, pd.DataFrame], category:List):
+def set_data(xs: Union[np.array, pd.DataFrame], ys: Union[np.array, pd.DataFrame], category: List, eval_func):
     S.xs = xs
     S.ys = ys
     S.category = category
+    S.eval_func = eval_func
 
 
 def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2):
@@ -55,15 +57,15 @@ def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1
     for idx, (trn_idx, val_idx) in enumerate(kf.split(S.xs)):
         trn_data = lgb.Dataset(S.xs[trn_idx], label=S.ys[trn_idx], categorical_feature=S.category)
         val_data = lgb.Dataset(S.xs[val_idx], label=S.ys[val_idx], categorical_feature=S.category)
-        num_round = 10000
+        num_round = 100000
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
             trn_data, val_data], verbose_eval=0, early_stopping_rounds=10, categorical_feature=S.category)
         predictions[val_idx] = clf.predict(S.xs[val_idx])
         models.append(clf)
         #mae = metrics.mean_absolute_error(ys[val_idx], clf.predict(xs[val_idx]))
-        mape = EvalFunc.mape(S.ys[val_idx], clf.predict(S.xs[val_idx]))
-        print(idx, mape)
-        eval_losses.append(mape)
+        eval_loss = S.eval_func(S.ys[val_idx], clf.predict(S.xs[val_idx]))
+        print(idx, eval_loss)
+        eval_losses.append(eval_loss)
 
     if finish is False:
         return np.mean(eval_losses)
@@ -81,9 +83,14 @@ def objective(trial):
     return trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2)
 
 
+def search(xs, ys, category, eval_func):
+    S.xs = xs
+    S.ys = ys
+    S.category=category
+    S.eval_func=eval_func
+    run(n_trials=15)
+
 finish = False
-
-
 def run(n_trials=10):
     if isinstance(S.xs, pd.DataFrame):
         print('S.xs is may be pd.DataFrame, so change S.xs, S.ys to np.array')

@@ -1,4 +1,13 @@
 
+from IPython.core.display import display, HTML
+import GetFeatureImportance
+import GetCorHeatMap
+import CountEncoder
+import LabelEncoder
+import ExpectIsCategorical
+import EvalFunc
+import LGBSearch
+import LGB
 import pickle
 import networkx as nx
 import altair as alt
@@ -9,7 +18,7 @@ import gc
 from sklearn import linear_model
 from sklearn import metrics
 from sklearn.model_selection import StratifiedKFold, KFold, RepeatedKFold
-from sklearn.preprocessing import LabelEncoder
+#from sklearn.preprocessing import LabelEncoder
 from catboost import CatBoostRegressor
 import datetime
 import time
@@ -33,16 +42,9 @@ pd.options.display.precision = 15
 warnings.filterwarnings("ignore")
 
 # Local
-import LGB
-import LGBSearch
-import EvalFunc
-import ExpectIsCategorical
-import LabelEncoder
-import CountEncoder
-import GetCorHeatMap
-import GetFeatureImportance
 # COL数
-pd.set_option("display.max_columns", 120)
+pd.set_option("display.max_columns", None)
+# ROW数
+pd.set_option('display.max_rows', 1000)  
 # 幅
-from IPython.core.display import display, HTML
 display(HTML("<style>.container { width:100% !important; }</style>"))
