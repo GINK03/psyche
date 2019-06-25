@@ -1,0 +1,15 @@
+altair==3.1.0
+pandas_profiling==1.4.2
+networkx==2.3
+seaborn==0.9.0
+catboost==0.15.1
+tqdm==4.32.2
+lightgbm==2.2.3
+xgboost==0.90
+matplotlib==3.1.0
+numpy==1.16.4
+pandas==0.24.2
+ipython==7.5.0
+optuna==0.12.0
+scikit_learn==0.21.2
+typing==3.7.4
