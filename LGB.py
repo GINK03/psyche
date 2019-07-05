@@ -13,19 +13,23 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error
 import EvalFunc
 
+
 class Singleton(object):
     def __init__(self):
         self.xs = None
         self.ys = None
-        self.categories = []
+        self.category = []
         self.eval_func = None
         self.param = None
+
+
 S = Singleton()
 
-def set_data(xs, ys, categories=[], eval_func=None, param=None):
+
+def set_data(xs, ys, category=[], eval_func=None, param=None):
     S.xs = xs
     S.ys = ys
-    S.categories = categories
+    S.category = category
     if eval_func is not None:
         S.eval_func = eval_func
     else:
@@ -48,7 +52,7 @@ def set_data(xs, ys, categories=[], eval_func=None, param=None):
             "seed": 777,
             # 'max_bin': 512
         }
-        
+
 
 def train_with_singleton():
     #assert S.xs != None, "must set data first"
@@ -79,7 +83,7 @@ def train_with_singleton():
             'models': models}
 
 
-def shot_train(xs, ys, XT, categories, param, folds, eval_func, verbose, early_stopping_rounds, n_estimators):
+def shot_train(xs, ys, XT, category, param, folds, eval_func, verbose, early_stopping_rounds, n_estimators):
     if isinstance(xs, (pd.DataFrame)):
         print('input xs, ys, XT may be pd.DataFrame, so change to np.array')
         xs = xs.values
@@ -91,8 +95,8 @@ def shot_train(xs, ys, XT, categories, param, folds, eval_func, verbose, early_s
     models = []
     for idx, (trn_idx, val_idx) in enumerate(folds.split(xs)):
         print(f'now fold={idx:02d} split size is', folds.get_n_splits())
-        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=categories)
-        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=categories)
+        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=category)
+        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=category)
         num_round = n_estimators
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
             trn_data, val_data], verbose_eval=verbose, early_stopping_rounds=early_stopping_rounds)

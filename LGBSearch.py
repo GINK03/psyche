@@ -15,11 +15,14 @@ import EvalFunc
 import warnings
 warnings.filterwarnings("ignore")
 
+
 class Singleton(object):
     def __init__(self):
         self.xs = None
         self.ys = None
         self.category = None
+        self.objective = 'regression_l2'
+        self.metrics = 'mse'
 
 
 S = Singleton()
@@ -31,20 +34,19 @@ def set_data(xs: Union[np.array, pd.DataFrame], ys: Union[np.array, pd.DataFrame
     S.category = category
     S.eval_func = eval_func
 
-
 def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2):
     param = {
-        "objective": "regression_l1",
-        "metric": "mae",
+        "objective": S.objective,
+        "metric": S.metrics,
         "max_depth": max_depth,
         "num_leaves": num_leaves,
-        "learning_rate": 0.01,
+        "learning_rate": 0.03,
         "bagging_fraction": bagging_fraction,
         "feature_fraction": feature_fraction,
         "lambda_l1": lambda_l1,
         "lambda_l2": lambda_l2,
         "bagging_seed": 777,
-        "verbosity": -1,
+        "verbosity": 0,
         "seed": 777,
         # 'max_bin': 512
     }
@@ -59,7 +61,7 @@ def trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1
         val_data = lgb.Dataset(S.xs[val_idx], label=S.ys[val_idx], categorical_feature=S.category)
         num_round = 100000
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
-            trn_data, val_data], verbose_eval=0, early_stopping_rounds=10, categorical_feature=S.category)
+            trn_data, val_data], verbose_eval=1000, early_stopping_rounds=10, categorical_feature=S.category)
         predictions[val_idx] = clf.predict(S.xs[val_idx])
         models.append(clf)
         #mae = metrics.mean_absolute_error(ys[val_idx], clf.predict(xs[val_idx]))
@@ -82,15 +84,11 @@ def objective(trial):
     lambda_l2 = trial.suggest_uniform('lambda_l2', 0, 5)
     return trainer(max_depth, num_leaves, bagging_fraction, feature_fraction, lambda_l1, lambda_l2)
 
-
-def search(xs, ys, category, eval_func):
-    S.xs = xs
-    S.ys = ys
-    S.category=category
-    S.eval_func=eval_func
-    run(n_trials=15)
+def search(n_trials):
+    return run(n_trials=n_trials)
 
 finish = False
+
 def run(n_trials=10):
     if isinstance(S.xs, pd.DataFrame):
         print('S.xs is may be pd.DataFrame, so change S.xs, S.ys to np.array')

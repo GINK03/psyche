@@ -1,7 +1,9 @@
 
 from IPython.core.display import display, HTML
+import AdversarielClassify
 import GetFeatureImportance
 import GetCorHeatMap
+import GetCor
 import CountEncoder
 import LabelEncoder
 import ExpectIsCategorical
