@@ -10,6 +10,7 @@ import ExpectIsCategorical
 import EvalFunc
 import LGBSearch
 import LGB
+import Lasso
 import pickle
 import networkx as nx
 import altair as alt
