@@ -12,6 +12,7 @@ import LGBSearch
 import LGB
 import XGB
 import Lasso
+import Ser
 import pickle
 import networkx as nx
 import altair as alt
@@ -49,6 +50,6 @@ warnings.filterwarnings("ignore")
 # COL数
 pd.set_option("display.max_columns", None)
 # ROW数
-pd.set_option('display.max_rows', 1000)  
+pd.set_option('display.max_rows', 1000)
 # 幅
 display(HTML("<style>.container { width:100% !important; }</style>"))
