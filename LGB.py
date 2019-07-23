@@ -93,7 +93,7 @@ def shot_train(xs, ys, XT, category, param, folds, eval_func, verbose, early_sto
     oof_predictions = np.zeros((len(xs),))
     test_predictions = np.zeros((len(XT),))
     models = []
-    for idx, (trn_idx, val_idx) in enumerate(folds.split(xs)):
+    for idx, (trn_idx, val_idx) in enumerate(folds.split(xs, ys)):
         print(f'now fold={idx:02d} split size is', folds.get_n_splits())
         trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=category)
         val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=category)
