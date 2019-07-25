@@ -8,7 +8,9 @@ import CountEncoder
 import LabelEncoder
 import ExpectIsCategorical
 import EvalFunc
+import LGBHoldout
 import LGBSearch
+import LGBFillMissing
 import LGB
 import XGB
 import Lasso
