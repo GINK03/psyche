@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-def clip(input_dfs=[], pecentage=1, ignores=None):
+def clip(input_dfs=[], percentage=1, ignores=None):
     assert isinstance(ignores, list), "ignores must be a list of column-name."
     dfTrain, dfTest = input_dfs
     size = len(dfTrain)
