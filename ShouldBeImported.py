@@ -27,6 +27,7 @@ import Ser
 import PCA
 import PercentailClipper
 import TargetEncoder
+import Rank
 import pickle
 import networkx as nx
 import altair as alt
