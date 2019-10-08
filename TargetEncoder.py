@@ -25,8 +25,8 @@ def encode_with_columns_mutable_2(input_dfs=[], target=None, columns=[]):
             df[f'TargetEncoding_{c}'] = df[c].apply(lambda s: s_cs[s] if s_cs.get(s) else 0 )
 
 def noise(x):
-    ra = random.random()*0.2
-    return (0.8+ra)*x
+    ra = random.random()*0.8
+    return (0.2+ra)*x
 
 def encode_with_columns_mutable(input_dfs=[], ys=None, columns=[]):
     dfTrain, dfTest = input_dfs
