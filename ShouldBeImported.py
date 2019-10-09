@@ -60,13 +60,16 @@ from tqdm import tqdm_notebook
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import NuSVR, SVR
 from sklearn.metrics import mean_absolute_error
+
+# 描画関連
 pd.options.display.precision = 15
 warnings.filterwarnings("ignore")
-
-# Local
 # COL数
 pd.set_option("display.max_columns", None)
 # ROW数
 pd.set_option('display.max_rows', 1000)
 # 幅
 display(HTML("<style>.container { width:100% !important; }</style>"))
+
+# 最後の出力
+print('All components loads was done! Ready!')
