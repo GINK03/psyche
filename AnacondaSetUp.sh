@@ -3,9 +3,12 @@
 #conda install -c conda-forge opencv -y
 pip install opencv-python
 pip install optuna
+pip install neovim
 conda install pytorch torchvision -c pytorch -y
 conda install -c conda-forge lightgbm -y
 conda install -c conda-forge xgboost -y
 conda install -c conda-forge altair -y
 conda install -c conda-forge catboost -y
 conda install -c conda-forge pandas-profiling -y
+conda install -c conda-forge keras -y
+conda install -c conda-forge tensorflow-gpu -y
