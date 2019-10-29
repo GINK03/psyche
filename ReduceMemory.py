@@ -1,32 +1,34 @@
 import pandas as pd
 import numpy as np
+
+
 def reduce_mem_usage(df):
-    start_mem_usg = df.memory_usage().sum() / 1024**2 
-    print("Memory usage of properties dataframe is :",start_mem_usg," MB")
-    NAlist = [] # Keeps track of columns that have missing values filled in. 
+    start_mem_usg = df.memory_usage().sum() / 1024**2
+    print("Memory usage of properties dataframe is :", start_mem_usg, " MB")
+    NAlist = []  # Keeps track of columns that have missing values filled in.
     for col in df.columns:
-        if df[col].dtype != object:  # Exclude strings            
+        if df[col].dtype != object:  # Exclude strings
             # Print current column type
-            print("******************************")
-            print("Column: ",col)
-            print("dtype before: ",df[col].dtype)            
+            #print("******************************")
+            #print("Column: ", col)
+            #print("dtype before: ", df[col].dtype)
             # make variables for Int, max and min
             IsInt = False
             mx = df[col].max()
             mn = df[col].min()
-            print("min for this col: ",mn)
-            print("max for this col: ",mx)
+            #print("min for this col: ", mn)
+            #print("max for this col: ", mx)
             # Integer does not support NA, therefore, NA needs to be filled
-            if not np.isfinite(df[col]).all(): 
+            if not np.isfinite(df[col]).all():
                 NAlist.append(col)
-                df[col].fillna(mn-1,inplace=True)  
-                   
+                df[col].fillna(mn-1, inplace=True)
+
             # test if column can be converted to an integer
             asint = df[col].fillna(0).astype(np.int64)
             result = (df[col] - asint)
             result = result.sum()
             if result > -0.01 and result < 0.01:
-                IsInt = True            
+                IsInt = True
             # Make Integer/unsigned Integer datatypes
             if IsInt:
                 if mn >= 0:
@@ -46,17 +48,17 @@ def reduce_mem_usage(df):
                     elif mn > np.iinfo(np.int32).min and mx < np.iinfo(np.int32).max:
                         df[col] = df[col].astype(np.int32)
                     elif mn > np.iinfo(np.int64).min and mx < np.iinfo(np.int64).max:
-                        df[col] = df[col].astype(np.int64)    
+                        df[col] = df[col].astype(np.int64)
             # Make float datatypes 32 bit
             else:
                 df[col] = df[col].astype(np.float32)
-            
+
             # Print new column type
-            print("dtype after: ",df[col].dtype)
-            print("******************************")
+            #print("dtype after: ", df[col].dtype)
+            #rint("******************************")
     # Print final result
     print("___MEMORY USAGE AFTER COMPLETION:___")
-    mem_usg = df.memory_usage().sum() / 1024**2 
-    print("Memory usage is: ",mem_usg," MB")
-    print("This is ",100*mem_usg/start_mem_usg,"% of the initial size")
+    mem_usg = df.memory_usage().sum() / 1024**2
+    print("Memory usage is: ", mem_usg, " MB")
+    print("This is ", 100*mem_usg/start_mem_usg, "% of the initial size")
     return df, NAlist

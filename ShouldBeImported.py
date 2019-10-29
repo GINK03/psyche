@@ -27,6 +27,7 @@ import LGB
 import XGB
 import Lasso
 import Ser
+import ReduceMemory
 import PCA
 import PercentailClipper
 import TargetEncoder
