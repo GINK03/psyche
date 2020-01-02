@@ -11,7 +11,9 @@ You can use all function.
 %autoreload 2
 try:
     import sys
-    sys.path.append('../psyche/')
+	import os
+	HOME = os.environ['HOME']
+    sys.path.append(f'{HOME}/gimpei-dot-files/opt/psyche/')
     from ShouldBeImported import *
 except Exception as ex:
     print(ex)
