@@ -95,8 +95,8 @@ def shot_train(xs, ys, XT, cats_index, param, fold, eval_func, verbose, early_st
     models = []
     for idx, (trn_idx, val_idx) in enumerate(fold.split(xs, ys)):
         print(f'now fold={idx:02d} split size is', fold.get_n_splits())
-        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=category)
-        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=category)
+        trn_data = lgb.Dataset(xs[trn_idx], label=ys[trn_idx], categorical_feature=cats_index)
+        val_data = lgb.Dataset(xs[val_idx], label=ys[val_idx], categorical_feature=cats_index)
         num_round = n_estimators
         clf = lgb.train(param, trn_data, num_round, valid_sets=[
             trn_data, val_data], verbose_eval=verbose, early_stopping_rounds=early_stopping_rounds)
@@ -108,6 +108,7 @@ def shot_train(xs, ys, XT, cats_index, param, fold, eval_func, verbose, early_st
         eval_losses.append(eval_loss)
         models.append(clf)
 
+    print(f'total eval loss mean = {np.mean(eval_losses)}')
     return {'eval_loss': np.mean(eval_losses),
             'oof_predictions': oof_predictions,
             'test_predictions': test_predictions,
