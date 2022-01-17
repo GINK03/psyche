@@ -11,10 +11,17 @@ from sklearn.model_selection import KFold, KFold
 from sklearn import metrics
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error
-import EvalFunc
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import ShuffleSplit
 import numpy as np
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+try:
+    sys.path.append(f'{HERE}')
+    import EvalFunc
+except Exception as exc:
+    raise Exception(exc)
 
 def adversariel_train(xs, XT, category):
     if isinstance(xs, (pd.DataFrame)):
